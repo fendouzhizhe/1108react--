@@ -1,7 +1,7 @@
 import React, { Component } from "react";
-import { Form, Input, Button } from "antd";
-import axios from 'axios';
-import qs from 'querystring';
+import { Form, Input, Button} from "antd";
+import {reqLogin} from "../../ajax" ;
+
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
 
 import "./css/login.less";
@@ -11,32 +11,25 @@ import logo from "./images/logo.png";
 const { Item } = Form;
 
 
-//使用axios请求拦截器
-axios.interceptors.request.use((config)=>{
-  //获取请求方式
-  const {method,data}=config
-  // console.log(config) 
-  if(method.toLowerCase()==='post'&& data instanceof Object){
-    config.data=qs.stringify(data);//qs.stringify是将一个对象转化为urlencoded编码的字符串
-  }
 
-  return config
-})
 
 export default class Login extends Component {
   //表单提交的回调
-  onFinish = values => {
+  onFinish =async values => {
     //const{username,password}=values
-    axios.post('http://localhost:3000/login',values).then(
-      response => {console.log(response)},
-      error => {console.log(error)}
-    )
+    //  axios.post('http://localhost:3000/login',values).then(
+    //   response => {console.log(response)},
+    //   error => {console.log(error)}
+    //  )
+
+    // let result = await axios.post('http://localhost:3000/login',values)
+		// console.log('@@@',result);
     // axios.post('http://localhost:3000/login',`username=${username}&password=${password}`).then(
     //   response => {console.log(response)},
     //   error => {console.log(error)}
     // )
-    // let result = await reqLogin(values)
-		// console.log('@@@',result);
+    let result = await reqLogin(values)
+		console.log('@@@',result);
   };
 
   pwdValidator = (_, value) => {
