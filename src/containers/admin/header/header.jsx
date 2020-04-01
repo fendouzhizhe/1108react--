@@ -27,8 +27,7 @@ class Header extends Component {
 	logout = ()=>{
 		confirm({
 			title: '确定退出登录吗？', //弹窗主标题
-			//content: '若退出登录，需要重新登录'
-      icon: <ExclamationCircleOutlined />, 
+			icon: <ExclamationCircleOutlined />, 
       //弹窗中展示的图标
 			okText:'确认',
 			cancelText:'取消',
