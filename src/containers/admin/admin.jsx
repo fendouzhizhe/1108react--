@@ -4,7 +4,7 @@ import { Redirect } from "react-router-dom";
 import { Layout } from "antd";
 import Header from './header/header';
 import './css/admin.less'
-
+import LeftNav from './left_nav/left_nav';
 const {Footer, Sider, Content } = Layout;
 
 class Admin extends Component {
@@ -18,7 +18,9 @@ class Admin extends Component {
     }
     return (
       <Layout className="layout-wrap">
-          <Sider>Sider</Sider>
+          <Sider>
+            <LeftNav />
+          </Sider>
           <Layout>
             <Header />
             <Content>Content</Content>
