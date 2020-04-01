@@ -2,10 +2,14 @@ import axios from 'axios'
 import qs from 'querystring'
 import NProgress from 'nprogress'
 import {message as msg} from 'antd';
+import {AJAX_TIMEOUT,AJAX_BASE_URL} from '../config';
+
 import 'nprogress/nprogress.css'
 
-axios.defaults.timeout = 2000 //配置超时时间
-axios.defaults.baseURL = 'http://localhost:3000'
+//配置超时时间
+axios.defaults.timeout = AJAX_TIMEOUT 
+//请求基本路径
+axios.defaults.baseURL = AJAX_BASE_URL
 
 //使用axios请求拦截器
 axios.interceptors.request.use((config)=>{

@@ -8,8 +8,10 @@ import {
 } from "@ant-design/icons";
 import screenfull from "screenfull";
 import { createDeleteUserAction } from "../../../redux/actions/login";
-
+import {reqWeatherData} from "../../../ajax";
 import "./css/header.less";
+
+import dayjs from 'dayjs';
 
 const {confirm} = Modal;
 
@@ -17,7 +19,18 @@ class Header extends Component {
 
   state = {
     //标识是否全屏
-		isFull:false 
+    isFull:false,
+    time:dayjs().format('YYYY年 MM月DD日 HH:mm:ss ') ,
+
+    //天气信息
+    weatherData:{
+      //天气图片地址
+      dayPictureUrl:'', 
+      //天气文字信息
+      weather:'', 
+      //温度
+			temperature:'' 
+		} 
 	};
 
 	fullScreen = ()=>{
@@ -36,22 +49,40 @@ class Header extends Component {
 				this.props.deleteUser()
 			}
 		});
-	};
+  };
+  
+  getWeatherData = async ()=>{
+		let result = await reqWeatherData()
+		const {dayPictureUrl,weather,temperature} = result 
+		this.setState({weatherData:{dayPictureUrl,weather,temperature}})
+	}
 
 	componentDidMount(){
+    //检测全屏变化
 		screenfull.onchange(()=>{
 			let {isFull} = this.state
 			this.setState({isFull:!isFull})
-		})
-	};
+    })
+    //开启定时器
+    this.timer=setInterval(()=>{
+      this.setState({time:dayjs().format('YYYY年 MM月DD日 HH:mm:ss ')})
+    },1000)
+    //发送请求获取天气信息
+		this.getWeatherData()
+  };
+  
+  componentWillUnmount(){
+    clearInterval(this.timer)
+  }
 
 
   render() {
+    const {isFull,weatherData,time} = this.state
     return (
       <div className="header-wraper">
         <div className="header-top">
           <Button onClick={this.fullScreen} size="small">
-            {this.state.isFull ? (
+            {isFull ? (
               <FullscreenExitOutlined />
             ) : (
               <FullscreenOutlined />
@@ -67,12 +98,12 @@ class Header extends Component {
             <span>首页</span>
           </div>
           <div className="bottom-right">
-            <span>2020年4月1日 0:7:01</span>
+            <span>{time}</span>
             <img
-              src="http://img5.imgtn.bdimg.com/it/u=1382349970,2004873955&fm=26&gp=0.jpg"
+              src={weatherData.dayPictureUrl}
               alt=""
             />
-            <span>小雨转多云 温度：0~1℃</span>
+            <span>{weatherData.weather} 温度：{weatherData.temperature}</span>
           </div>
         </div>
       </div>
