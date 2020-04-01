@@ -1,9 +1,10 @@
 import React, { Component } from "react";
-import { Form, Input, Button} from "antd";
+import { Form, Input, Button,message} from "antd";
 import {reqLogin} from "../../ajax" ;
-
+import {connect} from 'react-redux';
+import {createSaveUserAction} from '../../redux/actions/login';
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
-
+import {Redirect} from 'react-router-dom';
 import "./css/login.less";
 
 import logo from "./images/logo.png";
@@ -13,7 +14,7 @@ const { Item } = Form;
 
 
 
-export default class Login extends Component {
+class Login extends Component {
   //表单提交的回调
   onFinish =async values => {
     //const{username,password}=values
@@ -29,7 +30,14 @@ export default class Login extends Component {
     //   error => {console.log(error)}
     // )
     let result = await reqLogin(values)
-		console.log('@@@',result);
+    const {status,data,msg}=result;
+    if(status===0){
+      //登录成功
+      this.props.saveUserInfo(data);//通知Redux保存数据
+      // this.props.history.replace('/admin');
+    }else{
+      message.error(msg)
+    }
   };
 
   pwdValidator = (_, value) => {
@@ -43,6 +51,9 @@ export default class Login extends Component {
   };
 
   render() {
+    if(this.props.isLogin){
+      return <Redirect to="/admin" />
+    }
     return (
       <div className="login">
         <div className="header">
@@ -97,4 +108,12 @@ export default class Login extends Component {
       </div>
     );
   }
-}
+};
+
+
+export default connect(
+  //传递状态
+  (state)=>({isLogin:state.userInfo.isLogin}),
+  //传递操作状态的方法
+  {saveUserInfo:createSaveUserAction}
+)(Login)
