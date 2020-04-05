@@ -8,85 +8,81 @@ import {
 } from "@ant-design/icons";
 import screenfull from "screenfull";
 import { createDeleteUserAction } from "../../../redux/actions/login";
-import {reqWeatherData} from "../../../ajax";
+import { createSaveUserAction } from "../../../redux/actions/login";
+import { reqWeatherData } from "../../../ajax";
 import "./css/header.less";
 
-import dayjs from 'dayjs';
+import dayjs from "dayjs";
 
-const {confirm} = Modal;
+const { confirm } = Modal;
 
 class Header extends Component {
-
   state = {
     //标识是否全屏
-    isFull:false,
-    time:dayjs().format('YYYY年 MM月DD日 HH:mm:ss ') ,
+    isFull: false,
+    time: dayjs().format("YYYY年 MM月DD日 HH:mm:ss "),
 
     //天气信息
-    weatherData:{
+    weatherData: {
       //天气图片地址
-      dayPictureUrl:'', 
+      dayPictureUrl: "",
       //天气文字信息
-      weather:'', 
+      weather: "",
       //温度
-			temperature:'' 
-		} 
-	};
+      temperature: ""
+    }
+  };
 
-	fullScreen = ()=>{
-		screenfull.toggle();
-	};
+  fullScreen = () => {
+    screenfull.toggle();
+  };
 
-	logout = ()=>{
-		confirm({
-			title: '确定退出登录吗？', //弹窗主标题
-			icon: <ExclamationCircleOutlined />, 
+  logout = () => {
+    confirm({
+      title: "确定退出登录吗？", //弹窗主标题
+      icon: <ExclamationCircleOutlined />,
       //弹窗中展示的图标
-			okText:'确认',
-			cancelText:'取消',
-			onOk:()=> { 
+      okText: "确认",
+      cancelText: "取消",
+      onOk: () => {
         //确认按钮的回调
-				this.props.deleteUser()
-			}
-		});
+        this.props.deleteUser();
+        this.props.deleteTitle('')
+      }
+    });
   };
-  
-  getWeatherData = async ()=>{
-		let result = await reqWeatherData()
-		const {dayPictureUrl,weather,temperature} = result 
-		this.setState({weatherData:{dayPictureUrl,weather,temperature}})
-	}
 
-	componentDidMount(){
-    //检测全屏变化
-		screenfull.onchange(()=>{
-			let {isFull} = this.state
-			this.setState({isFull:!isFull})
-    })
-    //开启定时器
-    this.timer=setInterval(()=>{
-      this.setState({time:dayjs().format('YYYY年 MM月DD日 HH:mm:ss ')})
-    },1000)
-    //发送请求获取天气信息
-		this.getWeatherData()
+  getWeatherData = async () => {
+    let result = await reqWeatherData();
+    const { dayPictureUrl, weather, temperature } = result;
+    this.setState({ weatherData: { dayPictureUrl, weather, temperature } });
   };
-  
-  componentWillUnmount(){
-    clearInterval(this.timer)
+
+  componentDidMount() {
+    //检测全屏变化
+    screenfull.onchange(() => {
+      let { isFull } = this.state;
+      this.setState({ isFull: !isFull });
+    });
+    //开启定时器
+    this.timer = setInterval(() => {
+      this.setState({ time: dayjs().format("YYYY年 MM月DD日 HH:mm:ss ") });
+    }, 1000);
+    //发送请求获取天气信息
+    this.getWeatherData();
   }
 
+  componentWillUnmount() {
+    clearInterval(this.timer);
+  }
 
   render() {
-    const {isFull,weatherData,time} = this.state
+    const { isFull, weatherData, time } = this.state;
     return (
       <div className="header-wraper">
         <div className="header-top">
           <Button onClick={this.fullScreen} size="small">
-            {isFull ? (
-              <FullscreenExitOutlined />
-            ) : (
-              <FullscreenOutlined />
-            )}
+            {isFull ? <FullscreenExitOutlined /> : <FullscreenOutlined />}
           </Button>
           <span className="user-show">欢迎，{this.props.username}</span>
           <Button onClick={this.logout} type="link">
@@ -95,28 +91,30 @@ class Header extends Component {
         </div>
         <div className="header-bottom">
           <div className="bottom-left">
-            <span>首页</span>
+            <span>{this.props.title}</span>
           </div>
           <div className="bottom-right">
             <span>{time}</span>
-            <img
-              src={weatherData.dayPictureUrl}
-              alt=""
-            />
-            <span>{weatherData.weather} 温度：{weatherData.temperature}</span>
+            <img src={weatherData.dayPictureUrl} alt="" />
+            <span>
+              {weatherData.weather} 温度：{weatherData.temperature}
+            </span>
           </div>
         </div>
       </div>
     );
   }
-};
-
+}
 
 export default connect(
   //传递状态
-	(state)=>({username:state.userInfo.user.username}),
-  //传递操作状态的方法
+  state => ({ 
+    //传递操作状态的方法
+    username: state.userInfo.user.username,
+    title:state.title }),
+  
   {
-		deleteUser:createDeleteUserAction
-	}
-)(Header)
+    deleteUser: createDeleteUserAction,
+    deleteTitle:createSaveUserAction
+  }
+)(Header);

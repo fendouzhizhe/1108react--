@@ -3,6 +3,9 @@ import qs from 'querystring'
 import NProgress from 'nprogress'
 import {message as msg} from 'antd';
 import {AJAX_TIMEOUT,AJAX_BASE_URL} from '../config';
+import store from '../redux/store';
+import {createDeleteUserAction} from '../redux/actions/login';
+import {createSaveTitleAction} from '../redux/actions/title';
 
 import 'nprogress/nprogress.css'
 
@@ -22,6 +25,13 @@ axios.interceptors.request.use((config)=>{
 		//JSON.stringify是用于将一个对象转为JSON字符串
 		//qs.stringify是用于将一个对象转为urlencoded编码的字符串
 	}
+
+	//从redux中获取token
+	const {token} = store.getState().userInfo
+	if(token){
+		config.headers.Authorization = 'atguigu_'+token
+	}
+
 	return config
 })
 
@@ -38,7 +48,13 @@ axios.interceptors.response.use(
 		//console.log('###',err);
 		let errmsg = '未知错误，请联系管理员' //定义一个错误信息
 		const {message} = err
-		if(message.indexOf('401') !== -1) errmsg = '身份校验失败，请重新登录！'
+		if(message.indexOf('401') !== -1){
+			//通知redux删除该用户的所有信息
+			store.dispatch(createDeleteUserAction())
+			store.dispatch(createSaveTitleAction(''))
+
+			errmsg = '身份校验失败，请重新登录！'
+		}
 		else if(message.indexOf('Network Error') !== -1) errmsg = '请检查网络连接！'
 		else if(message.indexOf('timeout') !== -1) errmsg = '网络不稳定，连接超时！'
 		msg.error(errmsg,1)
