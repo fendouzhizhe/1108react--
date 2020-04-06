@@ -15,7 +15,8 @@ class LeftNav extends Component {
 	getTitleByPath = ()=>{
 		const {pathname} = this.props.location
 		let currentKey = pathname.split('/').reverse()[0]
-		if(currentKey === 'admin') currentKey = 'home'
+    if(currentKey === 'admin') currentKey = 'home'
+    if(pathname.indexOf('product') !== -1) currentKey = 'product'
 		let title = ''
 		menus.forEach((menuObj)=>{
 			if(menuObj.children instanceof Array){
@@ -68,7 +69,8 @@ class LeftNav extends Component {
 
   render() {
     const currentPathArr = this.props.location.pathname.split("/");
-    const selectedKey = currentPathArr.reverse()[0];
+    let selectedKey = currentPathArr.reverse()[0];
+    if(currentPathArr.indexOf('product') !== -1) selectedKey = 'product'
     return (
       <div>
         <header className="nav-top">
