@@ -18,7 +18,9 @@ export default class Product extends Component {
     //当前是第几页
     current:1,
     //搜索关键词
-		keyWord:'',
+    keyWord:'',
+    //是否处于加载中
+    isLoading:true
 	}
 
 	getProductList = async(number=1)=>{
@@ -32,7 +34,7 @@ export default class Product extends Component {
 		const {status,data,msg} = result
 		if(status === 0 ){
 			const {list,total,pageNum} = data
-			this.setState({productList:list,total,current:pageNum})
+			this.setState({productList:list,total,current:pageNum,isLoading:false})
 		}else{
 			message.error(msg)
 		}
@@ -132,9 +134,11 @@ export default class Product extends Component {
 					<Button onClick={()=>{this.props.history.push('/admin/prod_about/product/add')}} type="primary" >
 						<PlusCircleOutlined />添加商品
 					</Button>
-				} 
+        } 
+        
 			>
 				<Table
+          loading={this.state.isLoading}
 					dataSource={dataSource} 
 					columns={columns} 
 					bordered

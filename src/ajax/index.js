@@ -41,3 +41,5 @@ export const reqSearchProduct = (searchType, keyWord, pageNum, pageSize) =>
   ajax.get("/manage/product/search", {
     params: { [searchType]: keyWord, pageNum, pageSize },
   });
+//请求商品详情(通过id)
+export const reqProductDetailById = (productId) => ajax.get('/manage/product/info',{params:{productId}})
