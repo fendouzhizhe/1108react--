@@ -1,7 +1,7 @@
 import React, {Component} from 'react'
 import {Card,Select,Input,Button,Table, message} from 'antd';
 import {SearchOutlined,PlusCircleOutlined} from '@ant-design/icons';
-import {reqProductList,reqSearchProduct} from '../../../../ajax'
+import {reqProductList,reqSearchProduct,reqChangProductStatus} from '../../../../ajax'
 
 
 const {Option} = Select
@@ -38,6 +38,23 @@ export default class Product extends Component {
 		}else{
 			message.error(msg)
 		}
+  }
+  
+  changeProductStatus = async(currentProduct)=>{
+		let {_id,status} = currentProduct
+		if(status === 1){
+      status = 2
+    } else{
+      status = 1
+    } 
+		//发送请求更新状态
+		let result = await reqChangProductStatus(_id,status)
+		if(result.status === 0){
+			message.success('操作成功')
+			this.getProductList(this.state.current)
+		}else{
+			message.error(result.msg)
+		}
 	}
 
 	componentDidMount(){
@@ -70,16 +87,19 @@ export default class Product extends Component {
 			},
 			{
 				title: '状态',
-				dataIndex: 'status',
+				//dataIndex: 'status',
 				key: 'status',
 				align:'center',
-				render:(status)=>(
+				render:(productObj)=>(
 					<div>
-						<Button size="small" type={status === 1 ? 'danger' : 'primary'}>
-							{status === 1 ? '下架' : '上架'}
+						<Button 
+							onClick={()=>{this.changeProductStatus(productObj)}} 
+							size="small" type={productObj.status === 1 ? 'danger' : 'primary'}
+						>
+							{productObj.status === 1 ? '下架' : '上架'}
 						</Button>
 						<br/>
-						<span>{status === 1 ? '在售' : '售罄'}</span>
+						<span>{productObj.status === 1 ? '在售' : '售罄'}</span>
 					</div>
 				)
 			},
